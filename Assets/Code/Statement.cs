@@ -12,17 +12,26 @@ namespace Code
         {
             _plays = plays;
             
-            var totalAmount = 0;
             var result = $"Statement for {invoice.Customer}\n";
             foreach (var perf in invoice.Performances)
             {
                 // print line for this order
                 result += $"  {PlayFor(perf).Name}: {Usd(AmountFor(perf))} ({perf.Audience} seats)\n";
-                totalAmount += AmountFor(perf);
             }
             
-            result += $"Amount owed is {Usd(totalAmount)}\n";
+            result += $"Amount owed is {Usd(TotalAmount(invoice))}\n";
             result += $"You earned {TotalVolumeCredits(invoice)} credits\n";
+            return result;
+        }
+
+        private int TotalAmount(Invoice invoice)
+        {
+            var result = 0;
+            foreach (var perf in invoice.Performances)
+            {
+                result += AmountFor(perf);
+            }
+
             return result;
         }
 
