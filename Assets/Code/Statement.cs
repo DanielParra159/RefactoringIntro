@@ -7,8 +7,11 @@ namespace Code
 {
     public class Statement
     {
+        private Dictionary<string, Play> _plays;
         public string Generate(Invoice invoice, Dictionary<string, Play> plays)
         {
+            _plays = plays;
+            
             var totalAmount = 0;
             var volumeCredits = 0;
             var result = $"Statement for {invoice.Customer}\n";
@@ -18,7 +21,7 @@ namespace Code
                                        );
             foreach (var perf in invoice.Performances)
             {
-                var play = plays[perf.PlayId];
+                var play = PlayFor(perf);
 
                 var thisAmount = AmountFor(perf, play);
 
@@ -35,6 +38,12 @@ namespace Code
             result += $"Amount owed is {format(totalAmount / 100f)}\n";
             result += $"You earned {volumeCredits} credits\n";
             return result;
+        }
+
+        private Play PlayFor(Performance perf)
+        {
+            var play = _plays[perf.PlayId];
+            return play;
         }
 
         private int AmountFor(Performance aPerformance, Play play)
