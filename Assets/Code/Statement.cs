@@ -21,16 +21,14 @@ namespace Code
                                        );
             foreach (var perf in invoice.Performances)
             {
-                var thisAmount = AmountFor(perf);
-
                 // add volume credits
                 volumeCredits += Mathf.Max(perf.Audience - 30, 0);
                 // add extra credit for every ten comedy attendees
                 if (PlayFor(perf).Type == "comedy") volumeCredits += Mathf.FloorToInt(perf.Audience / 5f);
 
                 // print line for this order
-                result += $"  {PlayFor(perf).Name}: {format(thisAmount / 100f)} ({perf.Audience} seats)\n";
-                totalAmount += thisAmount;
+                result += $"  {PlayFor(perf).Name}: {format(AmountFor(perf) / 100f)} ({perf.Audience} seats)\n";
+                totalAmount += AmountFor(perf);
             }
 
             result += $"Amount owed is {format(totalAmount / 100f)}\n";
