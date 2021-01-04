@@ -15,22 +15,23 @@ namespace Code
             var totalAmount = 0;
             var volumeCredits = 0;
             var result = $"Statement for {invoice.Customer}\n";
-            Func<float, string> format =
-                value => value.ToString("C3",
-                                        CultureInfo.CreateSpecificCulture("en-US")
-                                       );
             foreach (var perf in invoice.Performances)
             {
                 volumeCredits += VolumeCredits(perf);
                 
                 // print line for this order
-                result += $"  {PlayFor(perf).Name}: {format(AmountFor(perf) / 100f)} ({perf.Audience} seats)\n";
+                result += $"  {PlayFor(perf).Name}: {Usd(AmountFor(perf))} ({perf.Audience} seats)\n";
                 totalAmount += AmountFor(perf);
             }
 
-            result += $"Amount owed is {format(totalAmount / 100f)}\n";
+            result += $"Amount owed is {Usd(totalAmount)}\n";
             result += $"You earned {volumeCredits} credits\n";
             return result;
+        }
+
+        private string Usd(float aNumber)
+        {
+            return (aNumber / 100f).ToString("C3", CultureInfo.CreateSpecificCulture("en-US"));
         }
 
         private int VolumeCredits(Performance aPerformance)
