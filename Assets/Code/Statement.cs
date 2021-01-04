@@ -21,7 +21,7 @@ namespace Code
                                        );
             foreach (var perf in invoice.Performances)
             {
-                var thisAmount = AmountFor(perf, PlayFor(perf));
+                var thisAmount = AmountFor(perf);
 
                 // add volume credits
                 volumeCredits += Mathf.Max(perf.Audience - 30, 0);
@@ -44,11 +44,11 @@ namespace Code
             return play;
         }
 
-        private int AmountFor(Performance aPerformance, Play play)
+        private int AmountFor(Performance aPerformance)
         {
             var result = 0;
 
-            switch (play.Type)
+            switch (PlayFor(aPerformance).Type)
             {
                 case "tragedy":
                     result = 40000;
@@ -68,7 +68,7 @@ namespace Code
                     result += 300 * aPerformance.Audience;
                     break;
                 default:
-                    throw new Exception($"Unknown type: {play.Type}");
+                    throw new Exception($"Unknown type: {PlayFor(aPerformance).Type}");
             }
 
             return result;
