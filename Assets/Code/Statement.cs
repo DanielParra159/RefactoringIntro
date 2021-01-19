@@ -26,11 +26,13 @@ namespace Code
         {
             public readonly string Customer;
             public readonly PerformanceData[] Performances;
+            public readonly int TotalAmount;
 
-            public StatementData(string customer, PerformanceData[] performances)
+            public StatementData(string customer, PerformanceData[] performances, int totalAmount)
             {
                 Customer = customer;
                 Performances = performances;
+                TotalAmount = totalAmount;
             }
         }
         private Dictionary<string, Play> _plays;
@@ -40,7 +42,8 @@ namespace Code
 
             var performancesData = EnrichPerformances(invoice);
             var statementData = new StatementData(invoice.Customer,
-                                                  performancesData);
+                                                  performancesData,
+                                                  TotalAmount(performancesData));
             return RenderPlainText(statementData, invoice);
         }
 
@@ -68,17 +71,17 @@ namespace Code
                 result += $"  {perf.Play.Name}: {Usd(perf.Amount)} ({perf.Audience} seats)\n";
             }
             
-            result += $"Amount owed is {Usd(TotalAmount(invoice))}\n";
+            result += $"Amount owed is {Usd(data.TotalAmount)}\n";
             result += $"You earned {TotalVolumeCredits(invoice)} credits\n";
             return result;
         }
 
-        private int TotalAmount(Invoice invoice)
+        private int TotalAmount(PerformanceData[] performance)
         {
             var result = 0;
-            foreach (var perf in invoice.Performances)
+            foreach (var perf in performance)
             {
-                result += AmountFor(perf);
+                result += perf.Amount;
             }
 
             return result;
