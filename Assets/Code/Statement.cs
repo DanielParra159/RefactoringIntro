@@ -7,26 +7,65 @@ namespace Code
 {
     public class Statement
     {
+        private class PerformanceData
+        {
+            public readonly string PlayId;
+            public readonly int Audience;
+            public readonly Play Play;
+            public readonly int Amount;
+
+            public PerformanceData(string playId, int audience, Play play, int amount)
+            {
+                PlayId = playId;
+                Audience = audience;
+                Play = play;
+                Amount = amount;
+            }
+        }
         private class StatementData
         {
-            
+            public readonly string Customer;
+            public readonly PerformanceData[] Performances;
+
+            public StatementData(string customer, PerformanceData[] performances)
+            {
+                Customer = customer;
+                Performances = performances;
+            }
         }
         private Dictionary<string, Play> _plays;
         public string Generate(Invoice invoice, Dictionary<string, Play> plays)
         {
             _plays = plays;
 
-            var statementData = new StatementData();
+            var performancesData = EnrichPerformances(invoice);
+            var statementData = new StatementData(invoice.Customer,
+                                                  performancesData);
             return RenderPlainText(statementData, invoice);
+        }
+
+        private PerformanceData[] EnrichPerformances(Invoice invoice)
+        {
+            var performancesData = new PerformanceData[invoice.Performances.Length];
+            for (var i = 0; i < invoice.Performances.Length; i++)
+            {
+                var performance = invoice.Performances[i];
+                performancesData[i] = new PerformanceData(performance.PlayId,
+                                                          performance.Audience,
+                                                          PlayFor(performance),
+                                                          AmountFor(performance));
+            }
+
+            return performancesData;
         }
 
         private string RenderPlainText(StatementData data, Invoice invoice)
         {
-            var result = $"Statement for {invoice.Customer}\n";
-            foreach (var perf in invoice.Performances)
+            var result = $"Statement for {data.Customer}\n";
+            foreach (var perf in data.Performances)
             {
                 // print line for this order
-                result += $"  {PlayFor(perf).Name}: {Usd(AmountFor(perf))} ({perf.Audience} seats)\n";
+                result += $"  {perf.Play.Name}: {Usd(perf.Amount)} ({perf.Audience} seats)\n";
             }
             
             result += $"Amount owed is {Usd(TotalAmount(invoice))}\n";
