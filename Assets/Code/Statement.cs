@@ -1,75 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using UnityEngine;
 
 namespace Code
 {
     public class Statement
     {
-        private class PerformanceData
-        {
-            public readonly string PlayId;
-            public readonly int Audience;
-            public readonly Play Play;
-            public readonly int Amount;
-            public readonly int VolumeCredits;
-
-            public PerformanceData(string playId, int audience, Play play, int amount, int volumeCredits)
-            {
-                PlayId = playId;
-                Audience = audience;
-                Play = play;
-                Amount = amount;
-                VolumeCredits = volumeCredits;
-            }
-        }
-        private class StatementData
-        {
-            public readonly string Customer;
-            public readonly PerformanceData[] Performances;
-            public readonly int TotalAmount;
-            public readonly int TotalVolumeCredits;
-
-            public StatementData(string customer, PerformanceData[] performances, int totalAmount,
-                                 int totalVolumeCredits)
-            {
-                Customer = customer;
-                Performances = performances;
-                TotalAmount = totalAmount;
-                TotalVolumeCredits = totalVolumeCredits;
-            }
-        }
-        private Dictionary<string, Play> _plays;
         public string Generate(Invoice invoice, Dictionary<string, Play> plays)
         {
-            _plays = plays;
-
-            var performancesData = EnrichPerformances(invoice);
-            var statementData = new StatementData(invoice.Customer,
-                                                  performancesData,
-                                                  TotalAmount(performancesData),
-                                                  TotalVolumeCredits(performancesData));
-            return RenderPlainText(statementData, invoice);
+            var statementData = new CreateStatementData().Generate(invoice, plays);
+            return RenderPlainText(statementData);
         }
-
-        private PerformanceData[] EnrichPerformances(Invoice invoice)
+        
+        public string GenerateHtml(Invoice invoice, Dictionary<string, Play> plays)
         {
-            var performancesData = new PerformanceData[invoice.Performances.Length];
-            for (var i = 0; i < invoice.Performances.Length; i++)
-            {
-                var performance = invoice.Performances[i];
-                performancesData[i] = new PerformanceData(performance.PlayId,
-                                                          performance.Audience,
-                                                          PlayFor(performance),
-                                                          AmountFor(performance),
-                                                          VolumeCredits(performance));
-            }
-
-            return performancesData;
+            var statementData = new CreateStatementData().Generate(invoice, plays);
+            return RenderHtml(statementData);
         }
 
-        private string RenderPlainText(StatementData data, Invoice invoice)
+        private string RenderPlainText(StatementData data)
         {
             var result = $"Statement for {data.Customer}\n";
             foreach (var perf in data.Performances)
@@ -82,75 +33,27 @@ namespace Code
             result += $"You earned {data.TotalVolumeCredits} credits\n";
             return result;
         }
-
-        private int TotalAmount(PerformanceData[] performance)
+        
+        private string RenderHtml(StatementData data)
         {
-            var result = 0;
-            foreach (var perf in performance)
+            var result = $"<h1>{data.Customer}</h1>\n";
+            result += "<table>\n";
+            result += "<tr><th>play</th><th>seats</th><th>cost</th>\n";
+            foreach (var perf in data.Performances)
             {
-                result += perf.Amount;
+                // print line for this order
+                result += $"<tr><td>{perf.Play.Name}</td><td>{perf.Audience}</td><td>{Usd(perf.Amount)}</td>\n";
             }
-
+            result += "</table>\n";
+            result += $"<p>Amount owed is <em>{Usd(data.TotalAmount)}</em></p>\n";
+            result += $"<p>You earned <em>{data.TotalVolumeCredits}</em> credits</p>\n";
             return result;
-        }
-
-        private int TotalVolumeCredits(PerformanceData[] performance)
-        {
-            var volumeCredits = 0;
-            foreach (var perf in performance)
-            {
-                volumeCredits += perf.VolumeCredits;
-            }
-
-            return volumeCredits;
         }
 
         private string Usd(float aNumber)
         {
             return (aNumber / 100f).ToString("C3", CultureInfo.CreateSpecificCulture("en-US"));
         }
-
-        private int VolumeCredits(Performance aPerformance)
-        {
-            var result = Mathf.Max(aPerformance.Audience - 30, 0);
-            if (PlayFor(aPerformance).Type == "comedy") result += Mathf.FloorToInt(aPerformance.Audience / 5f);
-            return result;
-        }
-
-        private Play PlayFor(Performance perf)
-        {
-            var play = _plays[perf.PlayId];
-            return play;
-        }
-
-        private int AmountFor(Performance aPerformance)
-        {
-            var result = 0;
-
-            switch (PlayFor(aPerformance).Type)
-            {
-                case "tragedy":
-                    result = 40000;
-                    if (aPerformance.Audience > 30)
-                    {
-                        result += 1000 * (aPerformance.Audience - 30);
-                    }
-
-                    break;
-                case "comedy":
-                    result = 30000;
-                    if (aPerformance.Audience > 20)
-                    {
-                        result += 10000 + 500 * (aPerformance.Audience - 20);
-                    }
-
-                    result += 300 * aPerformance.Audience;
-                    break;
-                default:
-                    throw new Exception($"Unknown type: {PlayFor(aPerformance).Type}");
-            }
-
-            return result;
-        }
+        
     }
 }
