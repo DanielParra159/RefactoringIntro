@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +14,7 @@ namespace Code
                                    new Performance("othello", 40),
                                };
             var invoice = new Invoice("BigCo", performances);
-            var statement = new Statement();
+            var statement = new StatementPlainText();
             var plays = new Dictionary<string, Play>
                         {
                             {"hamlet", new Play("Hamlet", "tragedy")},

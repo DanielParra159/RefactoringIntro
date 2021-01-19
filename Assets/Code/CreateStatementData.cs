@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
@@ -49,11 +48,6 @@ namespace Code
         private int TotalVolumeCredits(PerformanceData[] performance)
         {
             return performance.Sum(perf => perf.VolumeCredits);
-        }
-
-        private string Usd(float aNumber)
-        {
-            return (aNumber / 100f).ToString("C3", CultureInfo.CreateSpecificCulture("en-US"));
         }
 
         private int VolumeCredits(Performance aPerformance)
