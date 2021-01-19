@@ -13,13 +13,15 @@ namespace Code
             public readonly int Audience;
             public readonly Play Play;
             public readonly int Amount;
+            public readonly int VolumeCredits;
 
-            public PerformanceData(string playId, int audience, Play play, int amount)
+            public PerformanceData(string playId, int audience, Play play, int amount, int volumeCredits)
             {
                 PlayId = playId;
                 Audience = audience;
                 Play = play;
                 Amount = amount;
+                VolumeCredits = volumeCredits;
             }
         }
         private class StatementData
@@ -27,12 +29,15 @@ namespace Code
             public readonly string Customer;
             public readonly PerformanceData[] Performances;
             public readonly int TotalAmount;
+            public readonly int TotalVolumeCredits;
 
-            public StatementData(string customer, PerformanceData[] performances, int totalAmount)
+            public StatementData(string customer, PerformanceData[] performances, int totalAmount,
+                                 int totalVolumeCredits)
             {
                 Customer = customer;
                 Performances = performances;
                 TotalAmount = totalAmount;
+                TotalVolumeCredits = totalVolumeCredits;
             }
         }
         private Dictionary<string, Play> _plays;
@@ -43,7 +48,8 @@ namespace Code
             var performancesData = EnrichPerformances(invoice);
             var statementData = new StatementData(invoice.Customer,
                                                   performancesData,
-                                                  TotalAmount(performancesData));
+                                                  TotalAmount(performancesData),
+                                                  TotalVolumeCredits(performancesData));
             return RenderPlainText(statementData, invoice);
         }
 
@@ -56,7 +62,8 @@ namespace Code
                 performancesData[i] = new PerformanceData(performance.PlayId,
                                                           performance.Audience,
                                                           PlayFor(performance),
-                                                          AmountFor(performance));
+                                                          AmountFor(performance),
+                                                          VolumeCredits(performance));
             }
 
             return performancesData;
@@ -72,7 +79,7 @@ namespace Code
             }
             
             result += $"Amount owed is {Usd(data.TotalAmount)}\n";
-            result += $"You earned {TotalVolumeCredits(invoice)} credits\n";
+            result += $"You earned {data.TotalVolumeCredits} credits\n";
             return result;
         }
 
@@ -87,12 +94,12 @@ namespace Code
             return result;
         }
 
-        private int TotalVolumeCredits(Invoice invoice)
+        private int TotalVolumeCredits(PerformanceData[] performance)
         {
             var volumeCredits = 0;
-            foreach (var perf in invoice.Performances)
+            foreach (var perf in performance)
             {
-                volumeCredits += VolumeCredits(perf);
+                volumeCredits += perf.VolumeCredits;
             }
 
             return volumeCredits;
