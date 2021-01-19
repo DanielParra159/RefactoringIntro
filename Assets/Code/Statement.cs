@@ -7,11 +7,21 @@ namespace Code
 {
     public class Statement
     {
+        private class StatementData
+        {
+            
+        }
         private Dictionary<string, Play> _plays;
         public string Generate(Invoice invoice, Dictionary<string, Play> plays)
         {
             _plays = plays;
-            
+
+            var statementData = new StatementData();
+            return RenderPlainText(statementData, invoice);
+        }
+
+        private string RenderPlainText(StatementData data, Invoice invoice)
+        {
             var result = $"Statement for {invoice.Customer}\n";
             foreach (var perf in invoice.Performances)
             {
