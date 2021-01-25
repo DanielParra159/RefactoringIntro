@@ -30,7 +30,7 @@ namespace Code
             for (var i = 0; i < invoice.Performances.Length; i++)
             {
                 var performance = invoice.Performances[i];
-                var performanceCalculator = new PerformanceCalculator(performance, PlayFor(performance));
+                var performanceCalculator = CreatePerformanceCalculator(performance, PlayFor(performance));
                 performancesData[i] = new PerformanceData(performance.PlayId,
                                                           performance.Audience,
                                                           performanceCalculator.Play,
@@ -39,6 +39,19 @@ namespace Code
             }
 
             return performancesData;
+        }
+
+        private PerformanceCalculator CreatePerformanceCalculator(Performance performance, Play play)
+        {
+            switch (play.Type)
+            {
+                case "tragedy":
+                    return new TragedyCalculator(performance, play);
+                case "comedy":
+                    return new ComedyCalculator(performance, play);
+                default:
+                    throw new Exception($"Unknown type: {play.Type}");
+            }
         }
 
         private int TotalAmount(PerformanceData[] performance)

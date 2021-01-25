@@ -3,52 +3,59 @@ using UnityEngine;
 
 namespace Code
 {
-    public class PerformanceCalculator
+    public class TragedyCalculator : PerformanceCalculator
     {
-        private readonly Performance _performance;
-        public readonly Play Play;
-
-        public PerformanceCalculator(Performance performance, Play play)
+        public TragedyCalculator(Performance performance, Play play) : base(performance, play)
         {
-            _performance = performance;
-            Play = play;
         }
-        
-        public int AmountFor()
+
+        public override int AmountFor()
         {
-            var result = 0;
-
-            switch (Play.Type)
+            var result = 40000;
+            if (Performance.Audience > 30)
             {
-                case "tragedy":
-                    result = 40000;
-                    if (_performance.Audience > 30)
-                    {
-                        result += 1000 * (_performance.Audience - 30);
-                    }
-
-                    break;
-                case "comedy":
-                    result = 30000;
-                    if (_performance.Audience > 20)
-                    {
-                        result += 10000 + 500 * (_performance.Audience - 20);
-                    }
-
-                    result += 300 * _performance.Audience;
-                    break;
-                default:
-                    throw new Exception($"Unknown type: {Play.Type}");
+                result += 1000 * (Performance.Audience - 30);
             }
 
             return result;
         }
-        
+    }
+
+    public class ComedyCalculator : PerformanceCalculator
+    {
+        public ComedyCalculator(Performance performance, Play play) : base(performance, play)
+        {
+        }
+
+        public override int AmountFor()
+        {
+            var result = 30000;
+            if (Performance.Audience > 20)
+            {
+                result += 10000 + 500 * (Performance.Audience - 20);
+            }
+
+            result += 300 * Performance.Audience;
+            return result;
+        }
+    }
+    public abstract class PerformanceCalculator
+    {
+        protected readonly Performance Performance;
+        public readonly Play Play;
+
+        public PerformanceCalculator(Performance performance, Play play)
+        {
+            Performance = performance;
+            Play = play;
+        }
+
+        public abstract int AmountFor();
         
         public int VolumeCredits()
         {
-            var result = Mathf.Max(_performance.Audience - 30, 0);
-            if (Play.Type == "comedy") result += Mathf.FloorToInt(_performance.Audience / 5f);
+            var result = Mathf.Max(Performance.Audience - 30, 0);
+            if (Play.Type == "comedy") result += Mathf.FloorToInt(Performance.Audience / 5f);
             return result;
         }
     }
