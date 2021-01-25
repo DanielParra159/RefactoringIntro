@@ -30,9 +30,10 @@ namespace Code
             for (var i = 0; i < invoice.Performances.Length; i++)
             {
                 var performance = invoice.Performances[i];
+                var performanceCalculator = new PerformanceCalculator(performance, PlayFor(performance));
                 performancesData[i] = new PerformanceData(performance.PlayId,
                                                           performance.Audience,
-                                                          PlayFor(performance),
+                                                          performanceCalculator.Play,
                                                           AmountFor(performance),
                                                           VolumeCredits(performance));
             }
