@@ -34,7 +34,7 @@ namespace Code
                 performancesData[i] = new PerformanceData(performance.PlayId,
                                                           performance.Audience,
                                                           performanceCalculator.Play,
-                                                          AmountFor(performance),
+                                                          performanceCalculator.AmountFor(),
                                                           VolumeCredits(performance));
             }
 
@@ -64,34 +64,6 @@ namespace Code
             return play;
         }
 
-        private int AmountFor(Performance aPerformance)
-        {
-            var result = 0;
-
-            switch (PlayFor(aPerformance).Type)
-            {
-                case "tragedy":
-                    result = 40000;
-                    if (aPerformance.Audience > 30)
-                    {
-                        result += 1000 * (aPerformance.Audience - 30);
-                    }
-
-                    break;
-                case "comedy":
-                    result = 30000;
-                    if (aPerformance.Audience > 20)
-                    {
-                        result += 10000 + 500 * (aPerformance.Audience - 20);
-                    }
-
-                    result += 300 * aPerformance.Audience;
-                    break;
-                default:
-                    throw new Exception($"Unknown type: {PlayFor(aPerformance).Type}");
-            }
-
-            return result;
-        }
+        
     }
 }

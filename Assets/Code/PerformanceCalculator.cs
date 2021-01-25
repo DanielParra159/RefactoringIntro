@@ -1,3 +1,5 @@
+using System;
+
 namespace Code
 {
     public class PerformanceCalculator
@@ -9,6 +11,36 @@ namespace Code
         {
             _performance = performance;
             Play = play;
+        }
+        
+        public int AmountFor()
+        {
+            var result = 0;
+
+            switch (Play.Type)
+            {
+                case "tragedy":
+                    result = 40000;
+                    if (_performance.Audience > 30)
+                    {
+                        result += 1000 * (_performance.Audience - 30);
+                    }
+
+                    break;
+                case "comedy":
+                    result = 30000;
+                    if (_performance.Audience > 20)
+                    {
+                        result += 10000 + 500 * (_performance.Audience - 20);
+                    }
+
+                    result += 300 * _performance.Audience;
+                    break;
+                default:
+                    throw new Exception($"Unknown type: {Play.Type}");
+            }
+
+            return result;
         }
     }
 }
