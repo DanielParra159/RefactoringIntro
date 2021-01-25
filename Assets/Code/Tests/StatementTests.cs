@@ -30,7 +30,7 @@ namespace Code.Tests
         [Test]
         public void Generate_ContainsCustomerName()
         {
-            var statement = new Statement();
+            var statement = new StatementPlainText();
             var result = statement.Generate(_invoice, _plays);
 
             Assert.IsTrue(result.Contains("Statement for BigCo"));
@@ -39,7 +39,7 @@ namespace Code.Tests
         [Test]
         public void Generate_ContainsPlaysAmount()
         {
-            var statement = new Statement();
+            var statement = new StatementPlainText();
             var result = statement.Generate(_invoice, _plays);
 
             Assert.IsTrue(result.Contains("Hamlet: $650.000 (55 seats)"));
@@ -50,7 +50,7 @@ namespace Code.Tests
         [Test]
         public void Generate_ContainsAmountOwned()
         {
-            var statement = new Statement();
+            var statement = new StatementPlainText();
             var result = statement.Generate(_invoice, _plays);
 
             Assert.IsTrue(result.Contains("Amount owed is $1,730.000"));
@@ -59,7 +59,7 @@ namespace Code.Tests
         [Test]
         public void Generate_ContainsEarnedCredits()
         {
-            var statement = new Statement();
+            var statement = new StatementPlainText();
             var result = statement.Generate(_invoice, _plays);
 
             Assert.IsTrue(result.Contains("You earned 47 credits"));
