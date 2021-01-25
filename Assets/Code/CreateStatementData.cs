@@ -35,7 +35,7 @@ namespace Code
                                                           performance.Audience,
                                                           performanceCalculator.Play,
                                                           performanceCalculator.AmountFor(),
-                                                          VolumeCredits(performance));
+                                                          performanceCalculator.VolumeCredits());
             }
 
             return performancesData;
@@ -49,13 +49,6 @@ namespace Code
         private int TotalVolumeCredits(PerformanceData[] performance)
         {
             return performance.Sum(perf => perf.VolumeCredits);
-        }
-
-        private int VolumeCredits(Performance aPerformance)
-        {
-            var result = Mathf.Max(aPerformance.Audience - 30, 0);
-            if (PlayFor(aPerformance).Type == "comedy") result += Mathf.FloorToInt(aPerformance.Audience / 5f);
-            return result;
         }
 
         private Play PlayFor(Performance perf)

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Code
 {
@@ -40,6 +41,14 @@ namespace Code
                     throw new Exception($"Unknown type: {Play.Type}");
             }
 
+            return result;
+        }
+        
+        
+        public int VolumeCredits()
+        {
+            var result = Mathf.Max(_performance.Audience - 30, 0);
+            if (Play.Type == "comedy") result += Mathf.FloorToInt(_performance.Audience / 5f);
             return result;
         }
     }
